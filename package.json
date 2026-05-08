@@ -2,7 +2,7 @@
   "name": "portfolio-k6-booker",
   "version": "1.0.0",
   "description": "Performance Testing Framework for the Restful-Booker API",
-  "main": "load-test.js",
+  "main": "test.js",
   "scripts": {
     "test:smoke": "k6 run -e TIPO=smoke test.js && open reporte_booker.html",
     "test:load": "k6 run -e TIPO=average test.js && open reporte_booker.html",
