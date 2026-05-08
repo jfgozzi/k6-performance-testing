@@ -1,0 +1,22 @@
+{
+  "name": "portfolio-k6-booker",
+  "version": "1.0.0",
+  "description": "Performance Testing Framework for the Restful-Booker API",
+  "main": "load-test.js",
+  "scripts": {
+    "test:smoke": "k6 run -e TIPO=smoke test.js && open reporte_booker.html",
+    "test:load": "k6 run -e TIPO=average test.js && open reporte_booker.html",
+    "test:stress": "k6 run -e TIPO=stress test.js && open reporte_booker.html",
+    "test:spike": "k6 run -e TIPO=spike test.js && open reporte_booker.html",
+    "test:soak": "k6 run -e TIPO=soak test.js && open reporte_booker.html",
+    "test:breakpoint": "k6 run -e TIPO=breakpoint test.js && open reporte_booker.html"
+  },
+  "keywords": [
+    "k6",
+    "performance-testing",
+    "qa-automation",
+    "api-testing"
+  ],
+  "author": "Juan Gozzi",
+  "license": "ISC"
+}
