@@ -1,10 +1,7 @@
-# 🚀 Restful-Booker Performance Testing Suite
+# Restful-Booker Performance Testing Suite
 
 This repository contains an automated performance testing framework built with **k6**. The project evaluates the robustness, scalability, and response times of the public API [Restful-Booker](https://restful-booker.herokuapp.com/).
 
-## 🎯 Project Architecture
-
-Unlike traditional single-flow scripts, this project is designed following the **DRY (Don't Repeat Yourself)** principle. It uses a single execution file and determines the load profile dynamically using **Environment Variables**.
 
 ### Key Features:
 * **Dynamic Multi-Scenario:** Supports Smoke, Load, Stress, Spike, Soak, and Breakpoint tests by injecting parameters from the terminal.
@@ -15,16 +12,15 @@ Unlike traditional single-flow scripts, this project is designed following the *
 
 ---
 
-## 🛠️ Technologies Used
+### Technologies Used
 
 * **[k6](https://k6.io/):** Core load injection engine (Open Source, written in Go).
 * **JavaScript (ES6):** Language used for scripting Virtual Users (VUs).
-* **Node.js & npm:** Used for quick script execution management (`package.json`).
 * **k6 HTML Reporter:** Community library for generating visual dashboards.
 
 ---
 
-## ⚙️ Prerequisites
+### Prerequisites
 
 To run this project in your local environment, you need to have installed:
 
@@ -33,11 +29,12 @@ To run this project in your local environment, you need to have installed:
 
 ---
 
-## 🚀 How to Run the Tests
+### How to Run the Tests?
 
-Thanks to the `package.json` configuration, running the different scenarios is extremely simple. Open your terminal at the root of the project and run the desired command:
+Open your terminal at the root of the project and run the desired command:
 
 ### 1. Smoke Test
 Ideal for verifying that the environment works and endpoints respond correctly before injecting load.
 ```bash
 npm run test:smoke
+```
