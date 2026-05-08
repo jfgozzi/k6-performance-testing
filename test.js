@@ -4,12 +4,9 @@ import { Trend } from 'k6/metrics';
 import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
 
 
-const crudCompletoTrend = new Trend('tiempo_total_crud_usuario');
+const completeCrud = new Trend('total_time_user_crud');
 
-const BASE_HEADERS = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-};
+const BASE_HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
 
 const avgLoadTest = 
 {
@@ -95,37 +92,35 @@ export function setup() {
     const body = JSON.stringify({ username: 'admin', password: 'password123' });
     const params = { headers: { 'Content-Type': 'application/json' } };
     const res = http.post(`${BASE_URL}/auth`, body, params);
+    check(res, { 
+        'status is 200': (r) => r.status === 200,
+        'token was generated': (r) => r.json().token !== undefined,
+    });
     return res.json().token; 
 }
 
 
 export default function (token) 
 {
-    let inicio = new Date().getTime();
-    let idReserva;
+    let start = new Date().getTime();
+    let idBooking;
     group('01. Creation Phase', () => 
     {
-        const params = 
-        {
-            headers: 
-            {
-                'Content-Type': 'application/json',  
-                'Accept': 'application/json'
-            }
-        };
-        const body = 
-        {
-            'firstname': 'Juan',
-            'lastname' : 'Gozzi',
-            'totalprice': 654,
-            'depositpaid': true,
+        const params = { headers: BASE_HEADERS };
+        const body = JSON.stringify
+        ({
+            'firstname': 'Juan', 'lastname' : 'Gozzi','totalprice': 654, 'depositpaid': true,
             'bookingdates': { 'checkin': '2026-01-01', 'checkout': '2026-05-06' },
             'additionalneeds' : 'Internet and lunch.'
-        };
+        });
         sleep(Math.random() * 8 + 1);
-        const res = http.post(`${BASE_URL}/booking`, JSON.stringify(body), params);
-        check(res, { 'Booking created successfully': (a) => a.status === 200 });
-        idReserva = res.json().bookingid;
+        const res = http.post(`${BASE_URL}/booking`, body, params);
+        check(res, { 
+            'Booking created succesfully': (r) => r.status === 200,
+            'The id format is correctly': (r) => typeof r.json().bookingid === 'number',
+            'It took less than a second': (r) => r.timings.duration < 1000 
+        });        
+        idBooking = res.json().bookingid;
     });
 
 
@@ -133,8 +128,13 @@ export default function (token)
     {
         sleep(Math.random() * 8 + 1);
         const params = { headers: { 'Accept': 'application/json' }, tags: { name: '02. Consult_My_Booking' } };
-        const mia = http.get(`${BASE_URL}/booking/${idReserva}`, params);
-        check(mia, { 'Reading of my booking completed successfully': (a) => a.status === 200 });
+        const mine = http.get(`${BASE_URL}/booking/${idBooking}`, params);
+        check(mine, { 
+            'Reading completed': (r) => r.status === 200,
+            'The saved name is Juan': (r) => r.json().firstname === 'Juan',
+            'The saved lastname is Gozzi': (r) => r.json().lastname === 'Gozzi',
+            'The price is correct': (r) => r.json().totalprice === 654
+        });
     });
 
 
@@ -142,8 +142,16 @@ export default function (token)
     {
         sleep(Math.random() * 8 + 1);
         const body = { 'bookingdates': { 'checkin': '2026-06-10', 'checkout': '2026-06-18' } }
-        const params = { headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Cookie': `token=${token}` }, tags: { name: '03. Modify_Booking' } };
-        let modified = http.patch(`${BASE_URL}/booking/${idReserva}`, JSON.stringify(body), params);
+        const params = 
+        { 
+            headers: { ...BASE_HEADERS, 'Cookie': `token=${token}` }, 
+            tags: { name: '03. Modify_Booking' } 
+        };
+        let modified = http.patch(`${BASE_URL}/booking/${idBooking}`, JSON.stringify(body), params);
+        check(modified, { 
+            'Update completed successfully': (r) => r.status === 200,
+            'The check-in date was updated': (r) => r.json().bookingdates.checkin === '2026-06-10'
+        });
     });
         
     
@@ -151,9 +159,12 @@ export default function (token)
     {
         sleep(Math.random() * 8 + 1);
         const params = { headers: { 'Content-Type': 'application/json', 'Cookie': `token=${token}` }, tags: { name: '04. Delete_Booking' } };
-        let request = http.del(`${BASE_URL}/booking/${idReserva}`, null, params);
-        let fin = new Date().getTime();
-        crudCompletoTrend.add(fin - inicio);
+        let request = http.del(`${BASE_URL}/booking/${idBooking}`, null, params);
+        check(request, { 
+            'Booking deleted successfully': (r) => r.status === 201 
+        });
+        let end = new Date().getTime();
+        completeCrud.add(end - start);
     });
 }
 
