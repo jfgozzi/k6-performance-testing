@@ -37,4 +37,8 @@ Open your terminal at the root of the project and run the desired command:
 Ideal for verifying that the environment works and endpoints respond correctly before injecting load.
 ```bash
 npm run test:smoke
+<<<<<<< HEAD
 ```
+=======
+```
+>>>>>>> 18416752ff41c28510dbb3f8430f62afbd873a4f
